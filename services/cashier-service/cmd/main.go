@@ -3,26 +3,42 @@ package main
 import (
 	"context"
 	"log"
-	"time"
+	"net"
 
+	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/grpc"
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/repository"
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/service"
+
+	grpcserver "google.golang.org/grpc"
 )
 
+var GRPCAddr = ":9092"
+
 func main() {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	inmemRepo := repository.NewInmemRepository()
 	svc := service.NewService(inmemRepo)
 
-	t, err := svc.Deposit(ctx, "wangxijao", 100)
+	lis, err := net.Listen("tcp", GRPCAddr)
 	if err != nil {
-		log.Println(err)
+		log.Fatalf("failed to listen: %v", err)
 	}
 
-	log.Println(t)
+	grpcServer := grpcserver.NewServer()
+	grpc.NewGRPCHandler(grpcServer, svc)
 
-	for {
-		time.Sleep(time.Second)
-	}
+	log.Printf("Starting gRPC cashier service server on port %s", lis.Addr().String())
+
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Printf("failed to serve: %v", err)
+			cancel()
+		}
+	}()
+
+	<-ctx.Done()
+	log.Println("Shutting down the server...")
+	grpcServer.GracefulStop()
 }
