@@ -1,0 +1,18 @@
+name: the-casino-company
+services:
+  api-gateway:
+    build:
+      context: ../../..
+      dockerfile: infra/development/docker/api-gateway.Dockerfile
+    ports:
+      - "8081:8081"
+    env_file:
+      - ../../../services/.env
+    # environment:
+    #   - CASHIER_SERVICE_URL=cashier-service:9092
+  cashier-service:
+    build:
+      context: ../../..
+      dockerfile: infra/development/docker/cashier-service.Dockerfile
+    ports:
+      - "9092:9092"
