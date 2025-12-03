@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package cashier;
+
+option go_package = "shared/proto/cashier;cashier";
+
+service CashierService {
+    rpc Deposit(DepositRequest) returns (DepositResponse);
+    rpc Withdraw(WithdrawRequest) returns (WithdrawResponse);
+}
+
+message DepositRequest {
+    string userID = 1;
+    double amount = 2;
+}
+
+message DepositResponse {
+    string userID = 1;
+    double balance = 2;
+}
+
+message WithdrawRequest {
+    string userID = 1;
+    double amount = 2;
+}
+
+message WithdrawResponse {
+    string userID = 1;
+    double balance = 2;
+}
