@@ -4,10 +4,16 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
+	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/events"
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/grpc"
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/repository"
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/service"
+	"github.com/studysoros/the-casino-company/shared/env"
+	"github.com/studysoros/the-casino-company/shared/messaging"
 
 	grpcserver "google.golang.org/grpc"
 )
@@ -21,13 +27,32 @@ func main() {
 	inmemRepo := repository.NewInmemRepository()
 	svc := service.NewService(inmemRepo)
 
+	rabbitmqURI := env.GetString("RABBITMQ_URI", "amqp://guest:guest@rabbitmq:5672/")
+
+	go func() {
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+		<-sigCh
+		cancel()
+	}()
+
 	lis, err := net.Listen("tcp", GRPCAddr)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
+	rabbitmq, err := messaging.NewRabbitMQ(rabbitmqURI)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rabbitmq.Close()
+
+	log.Println("Starting RabbitMQ connection")
+
+	publisher := events.NewTxEventPublisher(rabbitmq)
+
 	grpcServer := grpcserver.NewServer()
-	grpc.NewGRPCHandler(grpcServer, svc)
+	grpc.NewGRPCHandler(grpcServer, svc, publisher)
 
 	log.Printf("Starting gRPC cashier service server on port %s", lis.Addr().String())
 

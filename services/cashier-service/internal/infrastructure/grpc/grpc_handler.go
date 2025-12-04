@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/domain"
+	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/events"
 	pb "github.com/studysoros/the-casino-company/shared/proto/cashier"
 
 	"google.golang.org/grpc"
@@ -15,14 +16,14 @@ import (
 type gRPCHandler struct {
 	pb.UnimplementedCashierServiceServer
 
-	service domain.TxService
-	// TODO: add event publisher (rabbitmq)
+	service   domain.TxService
+	publisher *events.TxEventPublisher
 }
 
-func NewGRPCHandler(server *grpc.Server, service domain.TxService) *gRPCHandler {
+func NewGRPCHandler(server *grpc.Server, service domain.TxService, publisher *events.TxEventPublisher) *gRPCHandler {
 	handler := &gRPCHandler{
-		service: service,
-		// TODO: add event publisher (rabbitmq)
+		service:   service,
+		publisher: publisher,
 	}
 
 	pb.RegisterCashierServiceServer(server, handler)
@@ -33,16 +34,18 @@ func (h *gRPCHandler) Deposit(ctx context.Context, req *pb.DepositRequest) (*pb.
 	userID := req.GetUserID()
 	amount := req.GetAmount()
 
-	receipt, err := h.service.Deposit(ctx, userID, amount)
+	deposit, err := h.service.Deposit(ctx, userID, amount)
 	if err != nil {
 		log.Println(err)
 		return nil, status.Errorf(codes.Internal, "failed to get route: %v", err)
 	}
 
-	balance := 10.0
+	if err := h.publisher.PublishTxDeposited(ctx, deposit); err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to publish the tx deposited event: %v", err)
+	}
 
 	return &pb.DepositResponse{
-		UserID:  receipt.UserId,
-		Balance: balance + receipt.Amount,
+		UserID: deposit.UserId,
+		Amount: deposit.Amount,
 	}, nil
 }
