@@ -18,6 +18,8 @@ func NewService(repo domain.TxRepository) *service {
 }
 
 func (s *service) Deposit(ctx context.Context, u string, a float64) (*domain.TxModel, error) {
+	// TODO: exchange curreny
+
 	tx := &domain.TxModel{
 		ID:     primitive.NewObjectID(),
 		UserId: u,
@@ -28,6 +30,8 @@ func (s *service) Deposit(ctx context.Context, u string, a float64) (*domain.TxM
 }
 
 func (s *service) Withdraw(ctx context.Context, u string, a float64) (*domain.TxModel, error) {
+	// TODO: exchange curreny
+
 	tx := &domain.TxModel{
 		ID:     primitive.NewObjectID(),
 		UserId: u,
