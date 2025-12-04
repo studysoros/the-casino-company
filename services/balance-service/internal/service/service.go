@@ -36,3 +36,7 @@ func (s *service) DeductBalance(ctx context.Context, userId string, amount float
 	}
 	return s.repo.UpdateBalance(ctx, u)
 }
+
+func (s *service) GetBalance(ctx context.Context, userId string) (*domain.BalanceModel, error) {
+	return s.repo.GetBalance(ctx, userId)
+}

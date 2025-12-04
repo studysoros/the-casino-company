@@ -32,3 +32,10 @@ func (r *inmemRepository) UpdateBalance(ctx context.Context, update *domain.Upda
 		Balance: r.userBalances[update.UserID],
 	}, nil
 }
+
+func (r *inmemRepository) GetBalance(ctx context.Context, userId string) (*domain.BalanceModel, error) {
+	return &domain.BalanceModel{
+		UserID:  userId,
+		Balance: r.userBalances[userId],
+	}, nil
+}

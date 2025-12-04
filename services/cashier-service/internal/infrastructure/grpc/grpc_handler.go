@@ -49,3 +49,5 @@ func (h *gRPCHandler) Deposit(ctx context.Context, req *pb.DepositRequest) (*pb.
 		Amount: deposit.Amount,
 	}, nil
 }
+
+// TODO: Withdraw
