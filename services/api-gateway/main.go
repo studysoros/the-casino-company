@@ -17,6 +17,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /cashier/deposit", handleDeposit)
+	mux.HandleFunc("/balance/balance", handleGetBalance)
 
 	server := &http.Server{
 		Addr:    httpAddr,
