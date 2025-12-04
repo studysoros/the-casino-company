@@ -16,7 +16,7 @@ message DepositRequest {
 
 message DepositResponse {
     string userID = 1;
-    double balance = 2;
+    double amount = 2;
 }
 
 message WithdrawRequest {
@@ -26,5 +26,12 @@ message WithdrawRequest {
 
 message WithdrawResponse {
     string userID = 1;
-    double balance = 2;
+    double amount = 2;
+}
+
+message Tx {
+    string id = 1;
+    string userID = 2;
+    string type = 3;
+    double amount = 4;
 }
