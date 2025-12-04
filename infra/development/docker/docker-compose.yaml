@@ -8,11 +8,39 @@ services:
       - "8081:8081"
     env_file:
       - ../../../services/.env
-    # environment:
-    #   - CASHIER_SERVICE_URL=cashier-service:9092
   cashier-service:
     build:
       context: ../../..
       dockerfile: infra/development/docker/cashier-service.Dockerfile
     ports:
       - "9092:9092"
+    env_file:
+      - ../../../services/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+  balance-service:
+    build:
+      context: ../../..
+      dockerfile: infra/development/docker/balance-service.Dockerfile
+    # ports:
+    #   - "9093:9093"
+    env_file:
+      - ../../../services/.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+  rabbitmq:
+    image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+      start_period: 10s
