@@ -3,21 +3,25 @@ package main
 import (
 	"context"
 	"log"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/studysoros/the-casino-company/services/balance-service/internal/infrastructure/events"
+	"github.com/studysoros/the-casino-company/services/balance-service/internal/infrastructure/grpc"
 	"github.com/studysoros/the-casino-company/services/balance-service/internal/infrastructure/repository"
 	"github.com/studysoros/the-casino-company/services/balance-service/internal/service"
 	"github.com/studysoros/the-casino-company/shared/env"
 	"github.com/studysoros/the-casino-company/shared/messaging"
+
+	grpcserver "google.golang.org/grpc"
 )
 
 var GRPCAddr = ":9093"
 
 func main() {
-	_, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 
 	inmemRepo := repository.NewInmemRepository()
 	svc := service.NewService(inmemRepo)
@@ -31,7 +35,10 @@ func main() {
 		cancel()
 	}()
 
-	// TODO: listen for tcp conn
+	lis, err := net.Listen("tcp", GRPCAddr)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
 
 	rabbitmq, err := messaging.NewRabbitMQ(rabbitmqURI)
 	if err != nil {
@@ -41,7 +48,8 @@ func main() {
 
 	log.Println("Starting RabbitMQ connection")
 
-	// TODO: setup gRPC server
+	grpcServer := grpcserver.NewServer()
+	grpc.NewGRPCHandler(grpcServer, svc)
 
 	consumer := events.NewTxConsumer(rabbitmq, svc)
 	go func() {
@@ -50,7 +58,17 @@ func main() {
 		}
 	}()
 
-	log.Printf("Listening for tx events on port %s", GRPCAddr)
+	log.Printf("Starting gRPC server balance service on port %s", lis.Addr().String())
 
-	select {}
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Printf("failed to serve: %v", err)
+			cancel()
+		}
+	}()
+
+	// wait for the shutdown signal
+	<-ctx.Done()
+	log.Println("Shutting down the server...")
+	grpcServer.GracefulStop()
 }

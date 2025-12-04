@@ -2,22 +2,22 @@ package grpc
 
 import (
 	"github.com/studysoros/the-casino-company/services/balance-service/internal/domain"
-	"github.com/studysoros/the-casino-company/services/balance-service/internal/infrastructure/events"
+	pb "github.com/studysoros/the-casino-company/shared/proto/balance"
+
+	"google.golang.org/grpc"
 )
 
 type gRPCHandler struct {
-	// TODO: protobuf gRPC
+	pb.UnimplementedBalanceServiceServer
 
-	service   domain.BalanceService
-	publisher *events.TxConsumer
+	service domain.BalanceService
 }
 
-func NewGRPCHandler(service domain.BalanceService, publisher *events.TxConsumer) *gRPCHandler {
+func NewGRPCHandler(server *grpc.Server, service domain.BalanceService) *gRPCHandler {
 	handler := &gRPCHandler{
-		service:   service,
-		publisher: publisher,
+		service: service,
 	}
 
-	// TODO: register handler with grpc server
+	pb.RegisterBalanceServiceServer(server, handler)
 	return handler
 }
