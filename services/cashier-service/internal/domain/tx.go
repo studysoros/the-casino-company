@@ -25,6 +25,6 @@ type TxRepository interface {
 }
 
 type TxService interface {
-	Deposit(ctx context.Context, u string, amount float64) (*TxModel, error)
-	Withdraw(ctx context.Context, u string, amount float64) (*TxModel, error)
+	Deposit(ctx context.Context, userId string, amount float64) (*TxModel, error)
+	Withdraw(ctx context.Context, userId string, amount float64) (*TxModel, error)
 }
