@@ -76,7 +76,7 @@ func (x *DepositRequest) GetAmount() float64 {
 type DepositResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserID        string                 `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
-	Balance       float64                `protobuf:"fixed64,2,opt,name=balance,proto3" json:"balance,omitempty"`
+	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -118,9 +118,9 @@ func (x *DepositResponse) GetUserID() string {
 	return ""
 }
 
-func (x *DepositResponse) GetBalance() float64 {
+func (x *DepositResponse) GetAmount() float64 {
 	if x != nil {
-		return x.Balance
+		return x.Amount
 	}
 	return 0
 }
@@ -180,7 +180,7 @@ func (x *WithdrawRequest) GetAmount() float64 {
 type WithdrawResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserID        string                 `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
-	Balance       float64                `protobuf:"fixed64,2,opt,name=balance,proto3" json:"balance,omitempty"`
+	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -222,9 +222,77 @@ func (x *WithdrawResponse) GetUserID() string {
 	return ""
 }
 
-func (x *WithdrawResponse) GetBalance() float64 {
+func (x *WithdrawResponse) GetAmount() float64 {
 	if x != nil {
-		return x.Balance
+		return x.Amount
+	}
+	return 0
+}
+
+type Tx struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserID        string                 `protobuf:"bytes,2,opt,name=userID,proto3" json:"userID,omitempty"`
+	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
+	Amount        float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Tx) Reset() {
+	*x = Tx{}
+	mi := &file_proto_cashier_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Tx) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Tx) ProtoMessage() {}
+
+func (x *Tx) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_cashier_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Tx.ProtoReflect.Descriptor instead.
+func (*Tx) Descriptor() ([]byte, []int) {
+	return file_proto_cashier_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Tx) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Tx) GetUserID() string {
+	if x != nil {
+		return x.UserID
+	}
+	return ""
+}
+
+func (x *Tx) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Tx) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
 	}
 	return 0
 }
@@ -236,16 +304,21 @@ const file_proto_cashier_proto_rawDesc = "" +
 	"\x13proto/cashier.proto\x12\acashier\"@\n" +
 	"\x0eDepositRequest\x12\x16\n" +
 	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\"C\n" +
+	"\x06amount\x18\x02 \x01(\x01R\x06amount\"A\n" +
 	"\x0fDepositResponse\x12\x16\n" +
-	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x18\n" +
-	"\abalance\x18\x02 \x01(\x01R\abalance\"A\n" +
+	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x01R\x06amount\"A\n" +
 	"\x0fWithdrawRequest\x12\x16\n" +
 	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x01R\x06amount\"D\n" +
+	"\x06amount\x18\x02 \x01(\x01R\x06amount\"B\n" +
 	"\x10WithdrawResponse\x12\x16\n" +
-	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x18\n" +
-	"\abalance\x18\x02 \x01(\x01R\abalance2\x8f\x01\n" +
+	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x16\n" +
+	"\x06amount\x18\x02 \x01(\x01R\x06amount\"X\n" +
+	"\x02Tx\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
+	"\x06userID\x18\x02 \x01(\tR\x06userID\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\x12\x16\n" +
+	"\x06amount\x18\x04 \x01(\x01R\x06amount2\x8f\x01\n" +
 	"\x0eCashierService\x12<\n" +
 	"\aDeposit\x12\x17.cashier.DepositRequest\x1a\x18.cashier.DepositResponse\x12?\n" +
 	"\bWithdraw\x12\x18.cashier.WithdrawRequest\x1a\x19.cashier.WithdrawResponseB\x1eZ\x1cshared/proto/cashier;cashierb\x06proto3"
@@ -262,12 +335,13 @@ func file_proto_cashier_proto_rawDescGZIP() []byte {
 	return file_proto_cashier_proto_rawDescData
 }
 
-var file_proto_cashier_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_proto_cashier_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_proto_cashier_proto_goTypes = []any{
 	(*DepositRequest)(nil),   // 0: cashier.DepositRequest
 	(*DepositResponse)(nil),  // 1: cashier.DepositResponse
 	(*WithdrawRequest)(nil),  // 2: cashier.WithdrawRequest
 	(*WithdrawResponse)(nil), // 3: cashier.WithdrawResponse
+	(*Tx)(nil),               // 4: cashier.Tx
 }
 var file_proto_cashier_proto_depIdxs = []int32{
 	0, // 0: cashier.CashierService.Deposit:input_type -> cashier.DepositRequest
@@ -292,7 +366,7 @@ func file_proto_cashier_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_cashier_proto_rawDesc), len(file_proto_cashier_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
