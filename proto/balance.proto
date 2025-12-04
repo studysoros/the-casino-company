@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package balance;
+
+option go_package = "shared/proto/balance;balance";
+
+service BalanceService {
+    rpc GetBalance(GetBalanceRequest) returns (GetBalanceResponse);
+}
+
+message GetBalanceRequest {
+    string userID = 1;
+}
+
+message GetBalanceResponse {
+    double balance = 1;
+}
