@@ -1,13 +1,13 @@
-# casino service
+# betting service
 
-This service handles all casino-related operations in the system.
+This service handles all betting-related operations in the system.
 
 ## Architecture
 
 The service follows Clean Architecture principles with the following structure:
 
 ```
-services/casino-service/
+services/betting-service/
 ├── cmd/                    # Application entry points
 │   └── main.go            # Main application setup
 ├── internal/              # Private application code
