@@ -51,10 +51,17 @@ func main() {
 	grpcServer := grpcserver.NewServer()
 	grpc.NewGRPCHandler(grpcServer, svc)
 
-	consumer := events.NewTxConsumer(rabbitmq, svc)
+	txConsumer := events.NewTxConsumer(rabbitmq, svc)
 	go func() {
-		if err := consumer.Listen(); err != nil {
-			log.Fatalf("Failed to listen to the message: %v", err)
+		if err := txConsumer.Listen(); err != nil {
+			log.Fatalf("tx consumer ailed to listen to the message: %v", err)
+		}
+	}()
+
+	betSettlementConsumer := events.NewBetSettlementConsumer(rabbitmq, svc, inmemRepo)
+	go func() {
+		if err := betSettlementConsumer.Listen(); err != nil {
+			log.Fatalf("bet settlement consumer failed to listen to the message: %v", err)
 		}
 	}()
 
