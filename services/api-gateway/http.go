@@ -81,3 +81,42 @@ func handleGetBalance(w http.ResponseWriter, r *http.Request) {
 	response := contracts.APIResponse{Data: balance}
 	writeJSON(w, http.StatusCreated, response)
 }
+
+func handlePlaceBet(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var reqBody betRequest
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		http.Error(w, "failed to parse JSON data.", http.StatusBadRequest)
+		return
+	}
+
+	defer r.Body.Close()
+
+	if reqBody.UserId == "" {
+		http.Error(w, "User ID is required", http.StatusBadRequest)
+		return
+	}
+
+	if reqBody.BetSide == "" {
+		http.Error(w, "Please place your side", http.StatusBadRequest)
+		return
+	}
+
+	bettingService, err := grpc_clients.NewBettingServiceClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer bettingService.Close()
+
+	bet, err := bettingService.Client.PlaceBet(ctx, reqBody.toProto())
+	if err != nil {
+		log.Printf("Failed to place a bet: %v", err)
+		http.Error(w, "Failed to place a bet", http.StatusInternalServerError)
+		return
+	}
+
+	response := contracts.APIResponse{Data: bet}
+	writeJSON(w, http.StatusCreated, response)
+}

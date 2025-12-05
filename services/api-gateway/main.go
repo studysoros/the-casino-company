@@ -18,6 +18,7 @@ func main() {
 
 	mux.HandleFunc("POST /cashier/deposit", handleDeposit)
 	mux.HandleFunc("/balance/balance", handleGetBalance)
+	mux.HandleFunc("POST /betting/placebet", handlePlaceBet)
 
 	server := &http.Server{
 		Addr:    httpAddr,
