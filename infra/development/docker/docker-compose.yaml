@@ -7,7 +7,7 @@ services:
     ports:
       - "8081:8081"
     env_file:
-      - ../../../services/.env
+      - ../../../.env
   cashier-service:
     build:
       context: ../../..
@@ -15,7 +15,7 @@ services:
     ports:
       - "9092:9092"
     env_file:
-      - ../../../services/.env
+      - ../../../.env
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -23,10 +23,21 @@ services:
     build:
       context: ../../..
       dockerfile: infra/development/docker/balance-service.Dockerfile
-    # ports:
-    #   - "9093:9093"
+    ports:
+      - "9093:9093"
     env_file:
-      - ../../../services/.env
+      - ../../../.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+  betting-service:
+    build:
+      context: ../../..
+      dockerfile: infra/development/docker/betting-service.Dockerfile
+    ports:
+      - "9094:9094"
+    env_file:
+      - ../../../.env
     depends_on:
       rabbitmq:
         condition: service_healthy
