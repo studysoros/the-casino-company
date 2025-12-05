@@ -34,7 +34,7 @@ func (h *gRPCHandler) Deposit(ctx context.Context, req *pb.DepositRequest) (*pb.
 	userID := req.GetUserID()
 	amount := req.GetAmount()
 
-	// TODO: Get real THB/USD FX rate from external API
+	// TODO: Get real USD/THB FX rate from external API
 	fx_rate := 33.0
 	amountInUsd := amount / fx_rate
 
