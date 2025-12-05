@@ -20,3 +20,6 @@ build_proto_cashier:
 
 build_proto_balance:
 	protoc --go_out=. --go-grpc_out=. ./proto/balance.proto
+
+build_proto_betting:
+	protoc --go_out=. --go-grpc_out=. ./proto/betting.proto

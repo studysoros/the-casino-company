@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package betting;
+
+option go_package = "shared/proto/betting;betting";
+
+service BettingService {
+    rpc PlaceBet(BetRequest) returns (BetResponse);
+}
+
+message BetRequest {
+    string UserID = 1;
+    string BetSide = 2;
+}
+
+message BetResponse {
+    string BetResult = 1;
+}
+
+message BetSettlement {
+    string id = 1;
+    string userID = 2;
+    string betResult = 3;
+}
