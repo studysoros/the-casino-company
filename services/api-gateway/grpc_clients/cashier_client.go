@@ -1,8 +1,7 @@
 package grpc_clients
 
 import (
-	"os"
-
+	"github.com/studysoros/the-casino-company/shared/env"
 	pb "github.com/studysoros/the-casino-company/shared/proto/cashier"
 
 	"google.golang.org/grpc"
@@ -15,10 +14,7 @@ type cashierServiceClient struct {
 }
 
 func NewCashierServiceClient() (*cashierServiceClient, error) {
-	cashierServiceUrl := os.Getenv("CASHIER_SERVICE_URL")
-	if cashierServiceUrl == "" {
-		cashierServiceUrl = "cashier-service:9092"
-	}
+	cashierServiceUrl := env.GetString("CASHIER_SERVICE_URL", "cashier-service:9092")
 
 	// TODO: ADD tracing interceptors for observability.
 

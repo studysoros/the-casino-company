@@ -1,8 +1,7 @@
 package grpc_clients
 
 import (
-	"os"
-
+	"github.com/studysoros/the-casino-company/shared/env"
 	pb "github.com/studysoros/the-casino-company/shared/proto/balance"
 
 	"google.golang.org/grpc"
@@ -15,10 +14,7 @@ type balanceServiceClient struct {
 }
 
 func NewBalanceServiceClient() (*balanceServiceClient, error) {
-	balanceServiceUrl := os.Getenv("BALANCE_SERVICE_URL")
-	if balanceServiceUrl == "" {
-		balanceServiceUrl = "balance-service:9093"
-	}
+	balanceServiceUrl := env.GetString("BALANCE_SERVICE_URL", "balance-service:9093")
 
 	// TODO: ADD tracing interceptors for observability.
 
