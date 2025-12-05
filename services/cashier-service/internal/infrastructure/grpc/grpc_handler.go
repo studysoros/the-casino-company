@@ -34,11 +34,7 @@ func (h *gRPCHandler) Deposit(ctx context.Context, req *pb.DepositRequest) (*pb.
 	userID := req.GetUserID()
 	amount := req.GetAmount()
 
-	// TODO: Get real USD/THB FX rate from external API
-	fx_rate := 33.0
-	amountInUsd := amount / fx_rate
-
-	deposit, err := h.service.Deposit(ctx, userID, amountInUsd)
+	deposit, err := h.service.Deposit(ctx, userID, amount)
 	if err != nil {
 		log.Println(err)
 		return nil, status.Errorf(codes.Internal, "failed to get route: %v", err)

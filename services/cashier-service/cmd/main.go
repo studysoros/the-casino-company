@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/events"
+	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/exchange"
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/grpc"
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/infrastructure/repository"
 	"github.com/studysoros/the-casino-company/services/cashier-service/internal/service"
@@ -25,7 +26,8 @@ func main() {
 	defer cancel()
 
 	inmemRepo := repository.NewInmemRepository()
-	svc := service.NewService(inmemRepo)
+	exchangeRate := exchange.NewFixedExchangeRateProvider(32.0)
+	svc := service.NewService(inmemRepo, exchangeRate)
 
 	rabbitmqURI := env.GetString("RABBITMQ_URI", "amqp://guest:guest@rabbitmq:5672/")
 

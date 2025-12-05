@@ -8,35 +8,41 @@ import (
 )
 
 type service struct {
-	repo domain.TxRepository
+	repo     domain.TxRepository
+	exchange domain.ExchangeRateProvider
 }
 
-func NewService(repo domain.TxRepository) *service {
+func NewService(repo domain.TxRepository, exchange domain.ExchangeRateProvider) *service {
 	return &service{
-		repo: repo,
+		repo:     repo,
+		exchange: exchange,
 	}
 }
 
-func (s *service) Deposit(ctx context.Context, u string, a float64) (*domain.TxModel, error) {
-	// TODO: exchange curreny
+func (s *service) Deposit(ctx context.Context, userId string, amount float64) (*domain.TxModel, error) {
+	fx_rate, err := s.exchange.GetUSDRate(ctx)
+	if err != nil {
+		return nil, err
+	}
+	amountInUsd := amount / fx_rate
 
 	tx := &domain.TxModel{
 		ID:     primitive.NewObjectID(),
-		UserId: u,
+		UserId: userId,
 		Type:   domain.TxTypeDeposit,
-		Amount: a,
+		Amount: amountInUsd,
 	}
 	return s.repo.CreateTx(ctx, tx)
 }
 
-func (s *service) Withdraw(ctx context.Context, u string, a float64) (*domain.TxModel, error) {
+func (s *service) Withdraw(ctx context.Context, userId string, amount float64) (*domain.TxModel, error) {
 	// TODO: exchange curreny
 
 	tx := &domain.TxModel{
 		ID:     primitive.NewObjectID(),
-		UserId: u,
+		UserId: userId,
 		Type:   domain.TxTypeWithdraw,
-		Amount: a,
+		Amount: amount,
 	}
 	return s.repo.CreateTx(ctx, tx)
 }
