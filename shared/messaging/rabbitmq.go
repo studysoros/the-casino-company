@@ -122,9 +122,9 @@ func (r *RabbitMQ) setupExchangesAndQueues() error {
 	}
 
 	if err := r.declareAndBindQueue(
-		BalanceUpdatedResponsesQueue,
+		BetSettlementQueue,
 		[]string{
-			contracts.BalanceEventUpdatedSuccess, contracts.BalanceEventUpdatedFailed,
+			contracts.BetSettlementWin, contracts.BetSettlementLoss,
 		},
 		CashierExchange,
 	); err != nil {

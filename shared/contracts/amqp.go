@@ -10,7 +10,7 @@ const (
 	TxEventDeposited = "tx.event.deposited"
 	TxEventWithdrawn = "tx.event.withdrawn"
 
-	// Updating Balance events
-	BalanceEventUpdatedSuccess = "balance.event.success"
-	BalanceEventUpdatedFailed  = "balance.event.failed"
+	// Bet events
+	BetSettlementWin  = "bet.settlement.win"
+	BetSettlementLoss = "bet.settlement.loss"
 )
