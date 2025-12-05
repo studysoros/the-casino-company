@@ -35,4 +35,6 @@ type BalanceService interface {
 	AddBalance(ctx context.Context, userId string, amount float64) (*BalanceModel, error)
 	DeductBalance(ctx context.Context, userId string, amount float64) (*BalanceModel, error)
 	GetBalance(ctx context.Context, userId string) (*BalanceModel, error)
+	ProcessWinningBet(ctx context.Context, userId string, prize float64) error
+	ProcessLosingBet(ctx context.Context, userId string, amount float64) error
 }

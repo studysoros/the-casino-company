@@ -58,7 +58,7 @@ func main() {
 		}
 	}()
 
-	betSettlementConsumer := events.NewBetSettlementConsumer(rabbitmq, svc, inmemRepo)
+	betSettlementConsumer := events.NewBetSettlementConsumer(rabbitmq, svc)
 	go func() {
 		if err := betSettlementConsumer.Listen(); err != nil {
 			log.Fatalf("bet settlement consumer failed to listen to the message: %v", err)

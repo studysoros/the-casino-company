@@ -3,7 +3,6 @@ package events
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/rabbitmq/amqp091-go"
@@ -15,14 +14,12 @@ import (
 type BetSettlementConsumer struct {
 	rabbitmq *messaging.RabbitMQ
 	service  domain.BalanceService
-	repo     domain.BalanceRepository
 }
 
-func NewBetSettlementConsumer(rabbitmq *messaging.RabbitMQ, service domain.BalanceService, repo domain.BalanceRepository) *BetSettlementConsumer {
+func NewBetSettlementConsumer(rabbitmq *messaging.RabbitMQ, service domain.BalanceService) *BetSettlementConsumer {
 	return &BetSettlementConsumer{
 		rabbitmq: rabbitmq,
 		service:  service,
-		repo:     repo,
 	}
 }
 
@@ -56,25 +53,9 @@ func (c *BetSettlementConsumer) Listen() error {
 }
 
 func (c *BetSettlementConsumer) handleWinningBet(ctx context.Context, payload messaging.BetSettlementEventData) error {
-	balance, err := c.repo.GetBalance(ctx, payload.BetSettlement.UserID)
-	if err != nil {
-		return fmt.Errorf("failed to get balance")
-	}
-	if balance.Balance < 100 {
-		return fmt.Errorf("insufficient balance")
-	}
-	c.service.AddBalance(ctx, payload.BetSettlement.UserID, 90.0)
-	return nil
+	return c.service.ProcessWinningBet(ctx, payload.BetSettlement.UserID, 90.0)
 }
 
 func (c *BetSettlementConsumer) handleLosingBet(ctx context.Context, payload messaging.BetSettlementEventData) error {
-	balance, err := c.repo.GetBalance(ctx, payload.BetSettlement.UserID)
-	if err != nil {
-		return fmt.Errorf("failed to get balance")
-	}
-	if balance.Balance < 100 {
-		return fmt.Errorf("insufficient balance")
-	}
-	c.service.DeductBalance(ctx, payload.BetSettlement.UserID, 100.0)
-	return nil
+	return c.service.ProcessLosingBet(ctx, payload.BetSettlement.UserID, 100.0)
 }
