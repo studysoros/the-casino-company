@@ -50,4 +50,22 @@ func (h *gRPCHandler) Deposit(ctx context.Context, req *pb.DepositRequest) (*pb.
 	}, nil
 }
 
-// TODO: Withdraw
+func (h *gRPCHandler) Withdraw(ctx context.Context, req *pb.WithdrawRequest) (*pb.WithdrawResponse, error) {
+	userID := req.GetUserID()
+	amount := req.GetAmount()
+
+	withdrawal, err := h.service.Withdraw(ctx, userID, amount)
+	if err != nil {
+		log.Println(err)
+		return nil, status.Errorf(codes.Internal, "failed to get route: %v", err)
+	}
+
+	if err := h.publisher.PublishTxWithdrawn(ctx, withdrawal); err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to publish the tx withdrawn event: %v", err)
+	}
+
+	return &pb.WithdrawResponse{
+		UserID: withdrawal.UserId,
+		Amount: withdrawal.Amount,
+	}, nil
+}

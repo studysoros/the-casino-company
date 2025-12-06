@@ -36,13 +36,17 @@ func (s *service) Deposit(ctx context.Context, userId string, amount float64) (*
 }
 
 func (s *service) Withdraw(ctx context.Context, userId string, amount float64) (*domain.TxModel, error) {
-	// TODO: exchange curreny
+	fx_rate, err := s.exchange.GetUSDRate(ctx)
+	if err != nil {
+		return nil, err
+	}
+	amountInUsd := amount / fx_rate
 
 	tx := &domain.TxModel{
 		ID:     primitive.NewObjectID(),
 		UserId: userId,
 		Type:   domain.TxTypeWithdraw,
-		Amount: amount,
+		Amount: amountInUsd,
 	}
 	return s.repo.CreateTx(ctx, tx)
 }
