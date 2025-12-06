@@ -5,11 +5,19 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/studysoros/the-casino-company/services/api-gateway/grpc_clients"
 	"github.com/studysoros/the-casino-company/shared/contracts"
+	pbBalance "github.com/studysoros/the-casino-company/shared/proto/balance"
+	pbBetting "github.com/studysoros/the-casino-company/shared/proto/betting"
+	pbCashier "github.com/studysoros/the-casino-company/shared/proto/cashier"
 )
 
-func handleDeposit(w http.ResponseWriter, r *http.Request) {
+type Server struct {
+	BalanceClient pbBalance.BalanceServiceClient
+	BettingClient pbBetting.BettingServiceClient
+	CashierClient pbCashier.CashierServiceClient
+}
+
+func (s *Server) handleDeposit(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var reqBody depositRequest
@@ -30,14 +38,7 @@ func handleDeposit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cashierService, err := grpc_clients.NewCashierServiceClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer cashierService.Close()
-
-	deposit, err := cashierService.Client.Deposit(ctx, reqBody.toProto())
+	deposit, err := s.CashierClient.Deposit(ctx, reqBody.toProto())
 	if err != nil {
 		log.Printf("Failed to deposit: %v", err)
 		http.Error(w, "Failed to deposit", http.StatusInternalServerError)
@@ -48,7 +49,7 @@ func handleDeposit(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, response)
 }
 
-func handleWithdraw(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleWithdraw(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var reqBody withdrawRequest
@@ -69,25 +70,18 @@ func handleWithdraw(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cashierService, err := grpc_clients.NewCashierServiceClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer cashierService.Close()
-
-	withdrawal, err := cashierService.Client.Withdraw(ctx, reqBody.toProto())
+	withdraw, err := s.CashierClient.Withdraw(ctx, reqBody.toProto())
 	if err != nil {
 		log.Printf("Failed to withdraw: %v", err)
 		http.Error(w, "Failed to withdraw", http.StatusInternalServerError)
 		return
 	}
 
-	response := contracts.APIResponse{Data: withdrawal}
-	writeJSON(w, http.StatusCreated, response)
+	response := contracts.APIResponse{Data: withdraw}
+	writeJSON(w, http.StatusOK, response)
 }
 
-func handleGetBalance(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleGetBalance(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var reqBody getBalanceRequest
@@ -103,14 +97,7 @@ func handleGetBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	balanceService, err := grpc_clients.NewBalanceServiceClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer balanceService.Close()
-
-	balance, err := balanceService.Client.GetBalance(ctx, reqBody.toProto())
+	balance, err := s.BalanceClient.GetBalance(ctx, reqBody.toProto())
 	if err != nil {
 		log.Printf("Failed to get user balance: %v", err)
 		http.Error(w, "Failed to get user balance", http.StatusInternalServerError)
@@ -118,10 +105,10 @@ func handleGetBalance(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := contracts.APIResponse{Data: balance}
-	writeJSON(w, http.StatusCreated, response)
+	writeJSON(w, http.StatusOK, response)
 }
 
-func handlePlaceBet(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handlePlaceBet(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var reqBody betRequest
@@ -142,14 +129,7 @@ func handlePlaceBet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bettingService, err := grpc_clients.NewBettingServiceClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer bettingService.Close()
-
-	bet, err := bettingService.Client.PlaceBet(ctx, reqBody.toProto())
+	bet, err := s.BettingClient.PlaceBet(ctx, reqBody.toProto())
 	if err != nil {
 		log.Printf("Failed to place a bet: %v", err)
 		http.Error(w, "Failed to place a bet", http.StatusInternalServerError)
@@ -157,5 +137,5 @@ func handlePlaceBet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := contracts.APIResponse{Data: bet}
-	writeJSON(w, http.StatusCreated, response)
+	writeJSON(w, http.StatusOK, response)
 }
