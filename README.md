@@ -48,7 +48,7 @@ The project follows strict **Clean Architecture** principles to separate busines
 To run the project locally, use Docker Compose:
 
 ```bash
-docker-compose -f infra/development/docker/docker-compose.yaml up -d --build
+docker-compose infra/development/docker/docker-compose.yaml up -d --build
 ```
 
 ### Services Ports
@@ -57,4 +57,5 @@ docker-compose -f infra/development/docker/docker-compose.yaml up -d --build
 - **Cashier Service**: `9092`
 - **Balance Service**: `9093`
 - **Betting Service**: `9094`
-- **RabbitMQ Management**: `http://localhost:15672` (User/Pass: `guest`/`guest`)
+- **RabbitMQ**: `5672`
+- **RabbitMQ Management**: `15672` (User/Pass: `guest`/`guest`)
