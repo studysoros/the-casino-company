@@ -17,6 +17,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /cashier/deposit", handleDeposit)
+	mux.HandleFunc("POST /cashier/withdraw", handleWithdraw)
 	mux.HandleFunc("/balance/balance", handleGetBalance)
 	mux.HandleFunc("POST /betting/placebet", handlePlaceBet)
 

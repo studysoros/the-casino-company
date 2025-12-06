@@ -11,6 +11,11 @@ type depositRequest struct {
 	Amount float64 `json:"amount"`
 }
 
+type withdrawRequest struct {
+	UserId string  `json:"userID"`
+	Amount float64 `json:"amount"`
+}
+
 type getBalanceRequest struct {
 	UserId string `json:"userID"`
 }
@@ -24,6 +29,13 @@ func (d *depositRequest) toProto() *pb.DepositRequest {
 	return &pb.DepositRequest{
 		UserID: d.UserId,
 		Amount: d.Amount,
+	}
+}
+
+func (w *withdrawRequest) toProto() *pb.WithdrawRequest {
+	return &pb.WithdrawRequest{
+		UserID: w.UserId,
+		Amount: w.Amount,
 	}
 }
 
