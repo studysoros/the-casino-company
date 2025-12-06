@@ -34,3 +34,19 @@ func (p *TxEventPublisher) PublishTxDeposited(ctx context.Context, tx *domain.Tx
 		Data:    txEventJSON,
 	})
 }
+
+func (p *TxEventPublisher) PublishTxWithdrawn(ctx context.Context, tx *domain.TxModel) error {
+	payload := messaging.TxEventData{
+		Tx: tx.ToProto(),
+	}
+
+	txEventJSON, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	return p.rabbitmq.PublishMessage(ctx, contracts.TxEventWithdrawn, contracts.AmqpMessage{
+		OwnerID: tx.UserId,
+		Data:    txEventJSON,
+	})
+}
