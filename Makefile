@@ -23,3 +23,9 @@ build_proto_balance:
 
 build_proto_betting:
 	protoc --go_out=. --go-grpc_out=. ./proto/betting.proto
+
+test:
+	go test ./services/...
+
+test-integration:
+	go test -v ./tests/integration/...
